@@ -51,89 +51,94 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
-  return (
-    <>
-      <Header />
-      <Main />
-    </>
-  );
+	const [movies, setMovies] = useState(tempMovieData);
+	const [watched, setWatched] = useState(tempWatchedData);
+
+	return (
+		<>
+			<Header>
+				<Search />
+				<NumResults movies={movies} />
+			</Header>
+			<Main>
+				<Box>
+					<MovieList movies={movies} />
+				</Box>
+				<Box>
+					<Summary watched={watched} />
+					<WatchedList watched={watched} />
+				</Box>
+				{/* <WatchedBox /> */}
+			</Main>
+		</>
+	);
 }
 
-function Header() {
-  return (
-    <nav className="nav-bar">
-      <Logo />
-      <Search />
-      <NumResults />
-    </nav>
-  );
+function Header({ children }) {
+	return (
+		<nav className="nav-bar">
+			<Logo />
+			{children}
+		</nav>
+	);
 }
 
 function Logo() {
-  return (
-    <div className="logo">
-      <span role="img">🍿</span>
-      <h1>usePopcorn</h1>
-    </div>
-  );
+	return (
+		<div className="logo">
+			<span role="img">🍿</span>
+			<h1>usePopcorn</h1>
+		</div>
+	);
 }
 
 function Search() {
-  const [query, setQuery] = useState("");
+	const [query, setQuery] = useState("");
 
-  return (
-    <input
-      className="search"
-      type="text"
-      placeholder="Search movies..."
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-    />
-  );
+	return (
+		<input
+			className="search"
+			type="text"
+			placeholder="Search movies..."
+			value={query}
+			onChange={(e) => setQuery(e.target.value)}
+		/>
+	);
 }
 
-function NumResults() {
-  return (
-    <p className="num-results">
-      Found <strong>{movies.length}</strong> results
-    </p>
-  );
+function NumResults({ movies }) {
+	return (
+		<p className="num-results">
+			Found <strong>{movies.length}</strong> results
+		</p>
+	);
 }
 
-function Main() {
-  return (
-    <main className="main">
-      <ListBox />
-      <WatchedBox />
-    </main>
-  );
+function Main({ children }) {
+	return <main className="main">{children}</main>;
 }
 
-function ListBox() {
-  const [isOpen1, setIsOpen1] = useState(true);
+function Box({ children }) {
+	const [isOpen, setIsOpen] = useState(true);
 
-  return (
-    <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen1((open) => !open)}>
-        {isOpen1 ? "–" : "+"}
-      </button>
-      {isOpen1 && <MovieList />}
-    </div>
-  );
+	return (
+		<div className="box">
+			<button className="btn-toggle" onClick={() => setIsOpen((open) => !open)}>
+				{isOpen ? "–" : "+"}
+			</button>
+			{isOpen && children}
+		</div>
+	);
 }
 
-function MovieList() {
-  const [movies, setMovies] = useState(tempMovieData);
-
-  return (
-    <ul className="list">
-      {movies?.map((movie) => (
-        <Movie movie={movie} key={movie.imdbID} />
-      ))}
-    </ul>
-  );
+function MovieList({ movies }) {
+	return (
+		<ul className="list">
+			{movies?.map((movie) => (
+				<Movie movie={movie} key={movie.imdbID} />
+			))}
+		</ul>
+	);
 }
 
 function Movie({ movie }) {
@@ -151,27 +156,26 @@ function Movie({ movie }) {
   );
 }
 
-function WatchedBox() {
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [isOpen2, setIsOpen2] = useState(true);
+// function WatchedBox() {
+//   const [isOpen2, setIsOpen2] = useState(true);
 
-  return (
-    <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen2((open) => !open)}>
-        {isOpen2 ? "–" : "+"}
-      </button>
-      {isOpen2 && (
-        <>
-          <Summary watched={watched} />
+//   return (
+//     <div className="box">
+//       <button
+//         className="btn-toggle"
+//         onClick={() => setIsOpen2((open) => !open)}>
+//         {isOpen2 ? "–" : "+"}
+//       </button>
+//       {isOpen2 && (
+//         <>
+//           <Summary watched={watched} />
 
-          <WatchedList watched={watched} />
-        </>
-      )}
-    </div>
-  );
-}
+//           <WatchedList watched={watched} />
+//         </>
+//       )}
+//     </div>
+//   );
+// }
 
 function Summary({ watched }) {
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
