@@ -53,39 +53,48 @@ const average = (arr) =>
 const KEY = "f84fc31d";
 
 export default function App() {
+	const [query, setQuery] = useState("");
 	const [movies, setMovies] = useState([]);
 	const [watched, setWatched] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
-	const query = "AOT";
 
-	useEffect(function () {
-		async function fetchMovies() {
-			try {
-				setIsLoading(true);
-				const res = await fetch(
-					`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-				);
+	useEffect(
+		function () {
+			async function fetchMovies() {
+				try {
+					setIsLoading(true);
+					setError("");
+					const res = await fetch(
+						`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+					);
 
-				if (!res.ok) throw new Error("something went wrong");
+					if (!res.ok) throw new Error("something went wrong");
 
-				const data = await res.json();
-				if (data.Response === "False") throw new Error("Movie not found");
-				setMovies(data.Search);
-			} catch (err) {
-				console.error(err.message);
-				setError(err.message);
-			} finally {
-				setIsLoading(false);
+					const data = await res.json();
+					if (data.Response === "False") throw new Error("Movie not found");
+					setMovies(data.Search);
+				} catch (err) {
+					console.error(err.message);
+					setError(err.message);
+				} finally {
+					setIsLoading(false);
+				}
 			}
-		}
-		fetchMovies();
-	}, []);
+			if (query.length < 3) {
+				setMovies([]);
+				setError("");
+				return;
+			}
+			fetchMovies();
+		},
+		[query]
+	);
 
 	return (
 		<>
 			<Header>
-				<Search />
+				<Search query={query} setQuery={setQuery} />
 				<NumResults movies={movies} />
 			</Header>
 			<Main>
@@ -123,9 +132,7 @@ function Logo() {
 	);
 }
 
-function Search() {
-	const [query, setQuery] = useState("");
-
+function Search({ query, setQuery }) {
 	return (
 		<input
 			className="search"
@@ -200,26 +207,6 @@ function Movie({ movie }) {
 	);
 }
 
-// function WatchedBox() {
-//   const [isOpen2, setIsOpen2] = useState(true);
-
-//   return (
-//     <div className="box">
-//       <button
-//         className="btn-toggle"
-//         onClick={() => setIsOpen2((open) => !open)}>
-//         {isOpen2 ? "–" : "+"}
-//       </button>
-//       {isOpen2 && (
-//         <>
-//           <Summary watched={watched} />
-
-//           <WatchedList watched={watched} />
-//         </>
-//       )}
-//     </div>
-//   );
-// }
 
 function Summary({ watched }) {
 	const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
